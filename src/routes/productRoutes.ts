@@ -6,13 +6,15 @@ import {
   getProducts,
   updateProduct,
 } from "../controllers/productController";
+import isAdminMiddleware from "../middlewares/adminMiddleware";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router: Router = express.Router();
 
-router.post("", createProduct);
+router.post("", authMiddleware, createProduct);
 router.get("", getProducts);
 router.get("/:id", getProduct);
-router.put("/:id", updateProduct);
-router.delete("/:id", deleteProduct);
+router.patch("/:id", authMiddleware, isAdminMiddleware, updateProduct);
+router.delete("/:id", authMiddleware, isAdminMiddleware, deleteProduct);
 
 export default router;
