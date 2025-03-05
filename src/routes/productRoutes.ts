@@ -11,7 +11,7 @@ import authMiddleware from "../middlewares/authMiddleware";
 
 const router: Router = express.Router();
 
-router.post("", authMiddleware, createProduct);
+router.post("", authMiddleware, isAdminMiddleware, createProduct);
 router.get("", getProducts);
 router.get("/:id", getProduct);
 router.patch("/:id", authMiddleware, isAdminMiddleware, updateProduct);

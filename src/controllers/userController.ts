@@ -81,7 +81,37 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
   res.status(200).json({ message: "Logged in successfully", token });
 };
 
-const deleteUser = async () => {};
-const updateUser = async () => {};
+const deleteUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const user = await User.findByIdAndDelete(id);
+    res.status(200).json({ message: "User deleted successfully", user });
+    return;
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+    return;
+  }
+};
+const updateUser = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { username, password } = req.body;
+  if (password) {
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(password, salt);
+    req.body.password = hashPassword;
+  }
+  try {
+    const user = await User.findByIdAndUpdate(
+      id,
+      { username, password },
+      { new: true }
+    );
+    res.status(202).json({ message: "User updated successfully", user });
+    return;
+  } catch (err) {
+    res.status(500).json({ error: (err as Error).message });
+    return;
+  }
+};
 
 export { createUser, deleteUser, getUser, getUsers, loginUser, updateUser };

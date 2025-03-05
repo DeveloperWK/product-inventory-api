@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import mongoose, { Types } from "mongoose";
 import Category from "../models/Category";
 import Product from "../models/Product";
 
@@ -35,64 +36,138 @@ const createProduct = async (req: Request, res: Response): Promise<void> => {
 const getProducts = async (req: Request, res: Response): Promise<void> => {
   try {
     const { page, limit, min, max, category } = req.query;
-    const categoryName = await Category.findById(category);
+
     const pageSize = Number(limit) || 5;
     const currentPage = Number(page) || 1;
     const skip = (currentPage - 1) * pageSize;
+
     const filters: {
-      price?: { $gte: string; $lte: string };
-      category?: string;
-      stock?: { $gte: string };
+      price?: { $gte: number; $lte: number };
+      category?: Types.ObjectId;
+
+      // stock?: { $gte: number };
     } = {};
-    if (typeof category === "string") {
-      filters.category = category;
-    }
+
     if (typeof min === "string" && typeof max === "string") {
-      filters.price = { $gte: min, $lte: max };
+      filters.price = {
+        $gte: Number(min),
+        $lte: Number(max),
+      };
     }
-    const totalStock = await Product.aggregate([
-      {
-        $group: {
-          _id: "$category",
-          totalStock: { $sum: "$stock" },
-        },
-      },
 
-      {
-        $lookup: {
-          from: "categories",
-          localField: "_id",
-          foreignField: "_id",
-          as: "categoryDetails",
-        },
-      },
-      {
-        $unwind: "$categoryDetails",
-      },
+    if (typeof category === "string") {
+      if (mongoose.Types.ObjectId.isValid(category)) {
+        filters.category = new mongoose.Types.ObjectId(category);
+      } else {
+        const categoryDoc = await Category.findOne({ name: category });
+        if (!categoryDoc) {
+          res.status(404).json({ message: "Category not found" });
+          return;
+        }
+        filters.category = categoryDoc._id as Types.ObjectId;
+      }
+    }
+    console.log("filters", filters);
 
+    const productsWithTotalStock = await Product.aggregate([
       {
-        $project: {
-          _id: 0,
-          categoryName: "$categoryDetails.name",
-          totalStock: 1,
+        $facet: {
+          productList: [
+            {
+              $match: filters,
+            },
+            {
+              $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "categoryDetails",
+              },
+            },
+            {
+              $unwind: "$categoryDetails",
+            },
+            {
+              $addFields: {
+                categoryName: "$categoryDetails.name",
+              },
+            },
+            {
+              $skip: skip,
+            },
+            {
+              $project: {
+                _id: 1,
+                name: 1,
+                stock: 1,
+                price: 1,
+                categoryName: 1,
+              },
+            },
+            {
+              $limit: pageSize,
+            },
+          ],
+
+          categoryWiseStock: [
+            // {
+            //   $match: {
+            //     stock: { $gt: 0 }, // Apply the same filter
+            //   },
+            // },
+            {
+              $lookup: {
+                from: "categories",
+                localField: "category",
+                foreignField: "_id",
+                as: "categoryDetails",
+              },
+            },
+            {
+              $unwind: "$categoryDetails",
+            },
+            {
+              $group: {
+                _id: "$categoryDetails.name", // Group by category name
+                totalStock: { $sum: "$stock" }, // Calculate total stock for the category
+              },
+            },
+            {
+              $project: {
+                _id: 0, // Remove the default _id field
+                categoryName: "$_id", // Use category name as the key
+                totalStock: 1,
+              },
+            },
+          ],
+
+          totalStock: [
+            // {
+            //   $match: {
+            //     stock: { $gt: 0 }, // Apply the same filter
+            //   },
+            // },
+            {
+              $group: {
+                _id: null, // Group all products together
+                fullStock: { $sum: "$stock" }, // Calculate total stock
+              },
+            },
+            {
+              $project: {
+                _id: 0, // Remove the default _id field
+                fullStock: 1, // Include only the total stock
+              },
+            },
+          ],
         },
       },
     ]);
-    const sum = totalStock.reduce((a, b) => a + b.totalStock, 0);
-    const products = await Product.find(filters)
-      .skip(skip)
-      .limit(pageSize)
-      .populate("category", "name -_id")
-      .sort({ createdAt: -1 })
-      .exec();
     const count = await Product.countDocuments(filters);
     res.status(200).json({
       message: "Products retrieved successfully",
-      products,
-      count,
+      productsWithTotalStock,
       currentPage,
-      totalStock,
-      totalSum: sum,
       totalPages: Math.ceil(count / pageSize),
     });
   } catch (err) {
