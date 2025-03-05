@@ -14,7 +14,7 @@ const router: Router = express.Router();
 router.post("", authMiddleware, isAdminMiddleware, createCategory);
 router.get("", getCategories);
 router.get("/:id", getCategory);
-router.put("/:id", authMiddleware, isAdminMiddleware, updateCategory);
+router.patch("/:id", authMiddleware, isAdminMiddleware, updateCategory);
 router.delete("/:id", authMiddleware, isAdminMiddleware, deleteCategory);
 
 export default router;
