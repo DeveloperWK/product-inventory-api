@@ -90,7 +90,7 @@ This RESTful API for managing product inventory is built using Node.js, Express.
 
 ## Deployment
 
-This API is deployed on **Railway**. You can access it here: [Live API](product-inventory-api-production.up.railway.app)
+This API is deployed on **Railway**. You can access it here: [Live API](https://product-inventory-api-production.up.railway.app/api/products)
 
 ## Testing
 

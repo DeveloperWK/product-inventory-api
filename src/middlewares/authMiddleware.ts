@@ -6,7 +6,7 @@ configDotenv();
 declare global {
   namespace Express {
     interface Request {
-      user?: any; // Replace 'any' with a proper type if you know the structure of the decoded token
+      locals?: any; // Replace 'any' with a proper type if you know the structure of the decoded token
     }
   }
 }
@@ -38,7 +38,7 @@ const authMiddleware = (
         return res.status(401).json({ message: "Invalid or expired token" });
       }
 
-      req.user = decoded;
+      req.locals = decoded;
 
       next();
     });

@@ -67,7 +67,6 @@ const getProducts = async (req: Request, res: Response): Promise<void> => {
         filters.category = categoryDoc._id as Types.ObjectId;
       }
     }
-    console.log("filters", filters);
 
     const productsWithTotalStock = await Product.aggregate([
       {
@@ -92,6 +91,7 @@ const getProducts = async (req: Request, res: Response): Promise<void> => {
                 categoryName: "$categoryDetails.name",
               },
             },
+
             {
               $skip: skip,
             },
@@ -160,14 +160,30 @@ const getProducts = async (req: Request, res: Response): Promise<void> => {
               },
             },
           ],
+          averagePrice: [
+            {
+              $group: {
+                _id: null, // Group all products together
+                averagePrice: { $avg: "$price" }, // Calculate average price
+              },
+            },
+            {
+              $project: {
+                _id: 0, // Remove the default _id field
+                averagePrice: { $round: ["$averagePrice", 2] }, // Include only the average price
+              },
+            },
+          ],
         },
       },
     ]);
     const count = await Product.countDocuments(filters);
+
     res.status(200).json({
       message: "Products retrieved successfully",
       productsWithTotalStock,
       currentPage,
+      count,
       totalPages: Math.ceil(count / pageSize),
     });
   } catch (err) {

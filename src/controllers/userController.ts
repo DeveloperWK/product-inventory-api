@@ -24,6 +24,11 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
       res.status(500).send(`All fields are required`);
       return;
     }
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      res.status(500).send("User already exists");
+      return;
+    }
     const user = await new User({ username, email, password }).save();
 
     res.status(201).json({
@@ -67,7 +72,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "User not found" });
     return;
   }
-  const isPasswordValid = await bcrypt.compare(password, user!.password);
+  const isPasswordValid = await user.comparePassword(password);
   if (!isPasswordValid) {
     res.status(401).json({ message: "Invalid username or password" });
     return;
@@ -76,9 +81,12 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     id: user!._id,
     email: user!.email,
     username: user!.username,
+    role: user!.role,
   };
   const token = jwt.sign(payload, SECRET);
-  res.status(200).json({ message: "Logged in successfully", token });
+  res
+    .status(200)
+    .json({ message: "Logged in successfully", token, role: user?.role });
 };
 
 const deleteUser = async (req: Request, res: Response) => {
