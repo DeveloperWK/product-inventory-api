@@ -8,6 +8,8 @@ const errorHandler = (
   next: NextFunction
 ) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
+  console.log("nodeenv", process.env.NODE_ENV);
+
   res.status(statusCode).json({
     message: err.message,
     stack: process.env.NODE_ENV === "production" ? null : err.stack,
