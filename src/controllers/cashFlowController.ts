@@ -3,21 +3,18 @@ import mongoose from "mongoose";
 import CashAccount from "../models/cashAccount";
 import Transaction, { ITransaction } from "../models/Transaction";
 
-// Create Transaction
-export const createTransaction = async (
+const createTransaction = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
     const { type, category, amount, paymentMethod, cashAccount } = req.body;
 
-    // Validate required fields
     if (!type || !category || !amount || !paymentMethod || !cashAccount) {
       res.status(400).json({ message: "Missing required fields" });
       return;
     }
 
-    // Validate amount
     if (amount <= 0) {
       res.status(400).json({ message: "Amount must be positive" });
       return;
@@ -28,18 +25,15 @@ export const createTransaction = async (
       date: req.body.date || new Date().toISOString(),
     });
 
-    // Update cash account balance
     const account = await CashAccount.findById(cashAccount);
     if (!account) {
       res.status(404).json({ message: "Cash account not found" });
       return;
     }
 
-    // Calculate new balance
     const amountToUpdate = type === "income" ? amount : -amount;
     const newBalance = account.balance + amountToUpdate;
 
-    // Start a session for transaction
     const session = await mongoose.startSession();
     session.startTransaction();
 
@@ -68,11 +62,7 @@ export const createTransaction = async (
   }
 };
 
-// Get All Transactions
-export const getTransactions = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+const getTransactions = async (req: Request, res: Response): Promise<void> => {
   try {
     const { type, startDate, endDate, category, minAmount, maxAmount } =
       req.query;
@@ -106,8 +96,7 @@ export const getTransactions = async (
   }
 };
 
-// Get Cash Flow Summary
-export const getCashFlowSummary = async (
+const getCashFlowSummary = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -149,11 +138,7 @@ export const getCashFlowSummary = async (
   }
 };
 
-// Get Single Transaction
-export const getTransaction = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+const getTransaction = async (req: Request, res: Response): Promise<void> => {
   try {
     const transaction = await Transaction.findById(req.params.id)
       .populate("relatedInventory")
@@ -173,8 +158,7 @@ export const getTransaction = async (
   }
 };
 
-// Update Transaction
-export const updateTransaction = async (
+const updateTransaction = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -188,12 +172,10 @@ export const updateTransaction = async (
       return;
     }
 
-    // Start a session for transaction
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      // If amount or type changed, we need to update account balances
       if (
         amount !== undefined ||
         type !== undefined ||
@@ -209,18 +191,15 @@ export const updateTransaction = async (
           return;
         }
 
-        // Revert old transaction effect
         const oldAmountEffect =
           transaction.type === "income"
             ? -transaction.amount
             : transaction.amount;
 
-        // Calculate new transaction effect
         const newType = type || transaction.type;
         const newAmount = amount || transaction.amount;
         const newAmountEffect = newType === "income" ? newAmount : -newAmount;
 
-        // Update old account balance
         if (
           (oldAccount._id as mongoose.Types.ObjectId).toString() !==
           (newAccount._id as mongoose.Types.ObjectId).toString()
@@ -232,7 +211,6 @@ export const updateTransaction = async (
           );
         }
 
-        // Update new account balance
         await CashAccount.findByIdAndUpdate(
           newAccount._id,
           {
@@ -270,8 +248,7 @@ export const updateTransaction = async (
   }
 };
 
-// Delete Transaction
-export const deleteTransaction = async (
+const deleteTransaction = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
@@ -283,12 +260,10 @@ export const deleteTransaction = async (
       return;
     }
 
-    // Start a session for transaction
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      // Revert the transaction effect on the cash account
       const amountEffect =
         transaction.type === "income"
           ? -transaction.amount
@@ -316,4 +291,12 @@ export const deleteTransaction = async (
       error: (error as Error).message,
     });
   }
+};
+export {
+  createTransaction,
+  deleteTransaction,
+  getCashFlowSummary,
+  getTransaction,
+  getTransactions,
+  updateTransaction,
 };

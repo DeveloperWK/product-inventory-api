@@ -1,97 +1,13 @@
-// import { Request, Response } from "express";
-// import Order from "../models/Orders";
-// import Product from "../models/Products";
-
-// const createOrder = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const { orderId, productId, quantity, price, due } = req.body;
-//     if (!orderId || !productId || !quantity || !price) {
-//       res.status(500).send(`All fields are required`);
-//       return;
-//     }
-//     const order = await new Order({
-//       orderId,
-//       price,
-//       product: productId,
-//       due,
-//       quantity,
-//     }).save();
-//     if (order) {
-//       const product = await Product.findById(productId);
-//       if (product) {
-//         product.stock -= quantity;
-//         await product.save();
-//       }
-//     }
-//     res.status(201).json({
-//       message: "Order created successfully",
-//       data: order,
-//     });
-//   } catch (err) {
-//     res.status(400).json({ error: (err as Error).message });
-//   }
-// };
-
-// const getOrders = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const orders = await Order.find();
-//     const count = await Order.countDocuments();
-//     res.status(200).json({
-//       message: "Orders retrieved successfully",
-//       data: orders,
-//       count,
-//     });
-//   } catch (err) {
-//     res.status(500).json({ error: (err as Error).message });
-//   }
-// };
-// const getOrder = async (req: Request, res: Response): Promise<void> => {
-//   try {
-//     const { id } = req.params;
-//     const order = await Order.findById(id);
-//     res.status(200).json(order);
-//   } catch (err) {
-//     res.status(500).json({ error: (err as Error).message });
-//   }
-// };
-
-// const deleteOrder = async () => {};
-// const updateOrder = async (req: Request, res: Response): Promise<void> => {
-//   const { id } = req.params;
-//   const { productId, quantity, price, due } = req.body;
-//   const order = await Order.findByIdAndUpdate(id, {
-//     price,
-//     product: productId,
-//     due,
-//     quantity,
-//   });
-//   if (order) {
-//     const product = await Product.findById(productId);
-//     if (product) {
-//       product.stock -= quantity;
-//       await product.save();
-//     }
-//     res.status(200).json({
-//       message: "Order updated successfully",
-//       data: order,
-//     });
-//   } else {
-//     res.status(404).json({ error: "Order not found" });
-//   }
-// };
-
-// export { createOrder, deleteOrder, getOrder, getOrders, updateOrder };
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Order, { IOrder } from "../models/Orders";
 import Product from "../models/Products";
 
-// Create Order
 const createOrder = async (req: Request, res: Response): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { orderType, items, totalAmount } = req.body;
+    const { orderType, items, totalAmount, courierId } = req.body;
     for (const item of items) {
       const product = await Product.findById(item.product).session(session);
       if (orderType === "sale" && product!.stock < item.quantity) {
@@ -103,12 +19,13 @@ const createOrder = async (req: Request, res: Response): Promise<void> => {
       orderType,
       items,
       totalAmount,
+      courierId,
     }).save();
     for (const item of items) {
       await Product.findByIdAndUpdate(
         item.product,
-        { $inc: { stock: -item.quantity } }, // Decrease stock
-        { session }, // Use same transaction session
+        { $inc: { stock: -item.quantity } },
+        { session },
       );
     }
     await session.commitTransaction();
@@ -124,7 +41,6 @@ const createOrder = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get All Orders
 const getOrders = async (req: Request, res: Response): Promise<void> => {
   try {
     const { orderType, status } = req.query;
@@ -146,7 +62,6 @@ const getOrders = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get Single Order
 const getOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -167,7 +82,6 @@ const getOrder = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Update Order
 const updateOrder = async (req: Request, res: Response): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -213,7 +127,6 @@ const updateOrder = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Delete Order
 const deleteOrder = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;

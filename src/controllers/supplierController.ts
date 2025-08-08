@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import Product from "../models/Products";
 import Supplier from "../models/Supplier";
 
-// Create Supplier
 const createSupplier = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, contact, paymentTerms } = req.body;
@@ -30,7 +29,6 @@ const createSupplier = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get All Suppliers
 const getSuppliers = async (req: Request, res: Response): Promise<void> => {
   try {
     const { isActive } = req.query;
@@ -48,7 +46,6 @@ const getSuppliers = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Get Single Supplier
 const getSupplier = async (req: Request, res: Response): Promise<void> => {
   try {
     const supplier = await Supplier.findById(req.params.id);
@@ -66,7 +63,6 @@ const getSupplier = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Update Supplier
 const updateSupplier = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
@@ -88,7 +84,6 @@ const updateSupplier = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-// Toggle Supplier Status
 const toggleSupplierStatus = async (
   req: Request,
   res: Response,
@@ -113,7 +108,6 @@ const toggleSupplierStatus = async (
   }
 };
 
-// Get Supplier Products
 const getSupplierProducts = async (
   req: Request,
   res: Response,
@@ -133,13 +127,11 @@ const getSupplierProducts = async (
   }
 };
 
-// Delete Supplier (Soft Delete)
 const deleteSupplier = async (req: Request, res: Response): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    // Check if supplier has associated products
     const productCount = await Product.countDocuments({
       supplier: req.params.id,
     }).session(session);

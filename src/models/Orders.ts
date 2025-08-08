@@ -14,7 +14,8 @@ export interface IOrder extends Document {
   due: number;
   paymentStatus: "pending" | "paid" | "partial";
   status: "processing" | "delivered" | "cancelled" | "completed" | "returned";
-  transaction: { type: mongoose.Schema.Types.ObjectId; ref: "Transaction" }; // Cash flow link
+  transaction: { type: mongoose.Schema.Types.ObjectId; ref: "Transaction" };
+  courierId: { type: String; unique: true };
 }
 
 const orderSchema = new mongoose.Schema<IOrder>(
@@ -38,12 +39,28 @@ const orderSchema = new mongoose.Schema<IOrder>(
       enum: ["paid", "pending", "partial"],
       default: "pending",
     },
-    transaction: { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" }, // Cash flow link
+    transaction: { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
+    courierId: { type: String, unique: true },
   },
   {
     timestamps: true,
   },
 );
 
+// orderSchema.index({
+//   title:"text",
+//   body:"text",
+//   }, { background: true })
+orderSchema.index(
+  {
+    title: "text",
+    body: "text",
+  },
+  {
+    weights: {
+      body: 5,
+    },
+  },
+);
 const Order = mongoose.model<IOrder>("Order", orderSchema);
 export default Order;

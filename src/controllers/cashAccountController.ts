@@ -4,11 +4,7 @@ import mongoose from "mongoose";
 import CashAccount from "../models/cashAccount";
 import Transaction from "../models/Transaction";
 
-// Create Cash Account
-export const createAccount = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+const createAccount = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, type } = req.body;
 
@@ -19,7 +15,7 @@ export const createAccount = async (
 
     const newAccount = new CashAccount({
       ...req.body,
-      balance: req.body.balance || 0,
+      balance: req.body.balance,
     });
 
     const savedAccount = await newAccount.save();
@@ -35,11 +31,7 @@ export const createAccount = async (
   }
 };
 
-// Get All Accounts
-export const getAccounts = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+const getAccounts = async (req: Request, res: Response): Promise<void> => {
   try {
     const { type, isActive } = req.query;
     const filter: any = {};
@@ -57,13 +49,13 @@ export const getAccounts = async (
   }
 };
 
-// Get Account Balance
-export const getAccountBalance = async (
+const getAccountBalance = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
   try {
-    const account = await CashAccount.findById(req.params.id);
+    const { id } = req.params;
+    const account = await CashAccount.findById(id);
 
     if (!account) {
       res.status(404).json({ message: "Account not found" });
@@ -83,11 +75,7 @@ export const getAccountBalance = async (
   }
 };
 
-// Transfer Between Accounts
-export const transferFunds = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
+const transferFunds = async (req: Request, res: Response): Promise<void> => {
   try {
     const { fromAccount, toAccount, amount, description } = req.body;
 
@@ -110,7 +98,6 @@ export const transferFunds = async (
     session.startTransaction();
 
     try {
-      // Verify accounts exist
       const sourceAccount =
         await CashAccount.findById(fromAccount).session(session);
       const targetAccount =
@@ -124,7 +111,6 @@ export const transferFunds = async (
         throw new Error("Insufficient funds");
       }
 
-      // Update balances
       await CashAccount.findByIdAndUpdate(
         fromAccount,
         { $inc: { balance: -amount } },
@@ -137,7 +123,6 @@ export const transferFunds = async (
         { session },
       );
 
-      // Create transfer transaction
       const transferOut = new Transaction({
         type: "transfer",
         category: "funds_transfer",
@@ -181,3 +166,4 @@ export const transferFunds = async (
     });
   }
 };
+export { createAccount, getAccountBalance, getAccounts, transferFunds };
