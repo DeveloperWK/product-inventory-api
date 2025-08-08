@@ -15,7 +15,8 @@ export interface IOrder extends Document {
   paymentStatus: "pending" | "paid" | "partial";
   status: "processing" | "delivered" | "cancelled" | "completed" | "returned";
   transaction: { type: mongoose.Schema.Types.ObjectId; ref: "Transaction" };
-  courierId: { type: String; unique: true };
+  courierId: string;
+  trackingCode: string;
 }
 
 const orderSchema = new mongoose.Schema<IOrder>(
@@ -41,6 +42,7 @@ const orderSchema = new mongoose.Schema<IOrder>(
     },
     transaction: { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
     courierId: { type: String, unique: true },
+    trackingCode: { type: String, unique: true },
   },
   {
     timestamps: true,

@@ -2,24 +2,44 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import Order, { IOrder } from "../models/Orders";
 import Product from "../models/Products";
+import handleCourier from "../utils/courierFunc";
 
 const createOrder = async (req: Request, res: Response): Promise<void> => {
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
-    const { orderType, items, totalAmount, courierId } = req.body;
+    const {
+      orderType,
+      items,
+      totalAmount,
+      courierId,
+      invoice,
+      recipient_name,
+      recipient_phone,
+      recipient_address,
+      note,
+    } = req.body;
     for (const item of items) {
       const product = await Product.findById(item.product).session(session);
       if (orderType === "sale" && product!.stock < item.quantity) {
         throw new Error(`Insufficient stock for ${product?.name}`);
       }
     }
-
+    const data = {
+      recipient_name,
+      recipient_phone,
+      recipient_address,
+      note,
+      cod_amount: totalAmount,
+      invoice,
+    };
+    const courier = await handleCourier(data);
     const newOrder: IOrder = await new Order({
       orderType,
       items,
       totalAmount,
-      courierId,
+      courierId: courier.consignment.consignment_id,
+      trackingCode: courier.consignment.tracking_code,
     }).save();
     for (const item of items) {
       await Product.findByIdAndUpdate(
