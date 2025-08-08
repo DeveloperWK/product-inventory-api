@@ -60,6 +60,7 @@ orderSchema.index(
     weights: {
       body: 5,
     },
+    name: "courierId",
   },
 );
 const Order = mongoose.model<IOrder>("Order", orderSchema);
