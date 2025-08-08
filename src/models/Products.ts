@@ -3,9 +3,11 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IProduct extends Document {
   name: string;
   price: number;
+  sku: string;
+  cost: number;
   category: Schema.Types.ObjectId;
+  supplier: Schema.Types.ObjectId;
   stock: number;
-  description?: string;
 }
 
 const productSchema = new Schema<IProduct>(
@@ -17,10 +19,12 @@ const productSchema = new Schema<IProduct>(
       ref: "Category",
       required: true,
     },
-    stock: { type: Number, required: true },
-    description: { type: String },
+    stock: { type: Number, default: 0 },
+    sku: { type: String, unique: true },
+    cost: { type: Number, required: true },
+    supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const Product = mongoose.model<IProduct>("Product", productSchema);

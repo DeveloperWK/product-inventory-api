@@ -1,4 +1,4 @@
-import express, { Router } from "express";
+import { Router } from "express";
 import {
   createCategory,
   deleteCategory,
@@ -6,15 +6,17 @@ import {
   getCategory,
   updateCategory,
 } from "../controllers/categoryController";
-import isAdminMiddleware from "../middlewares/adminMiddleware";
-import authMiddleware from "../middlewares/authMiddleware";
 
-const router: Router = express.Router();
+const router: Router = Router();
 
-router.post("", authMiddleware, isAdminMiddleware, createCategory);
+// router.post("", authMiddleware, isAdminMiddleware, createCategory);
+// router.get("", getCategories);
+// router.get("/:id", getCategory);
+// router.patch("/:id", authMiddleware, isAdminMiddleware, updateCategory);
+// router.delete("/:id", authMiddleware, isAdminMiddleware, deleteCategory);
+router.post("", createCategory);
 router.get("", getCategories);
 router.get("/:id", getCategory);
-router.patch("/:id", authMiddleware, isAdminMiddleware, updateCategory);
-router.delete("/:id", authMiddleware, isAdminMiddleware, deleteCategory);
-
+router.patch("/:id", updateCategory);
+router.delete("/:id", deleteCategory);
 export default router;

@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { configDotenv } from "dotenv";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import User from "../models/User";
+import User from "../models/Users";
 configDotenv();
 const SECRET = process.env.AUTH_SECRET as string;
 
@@ -14,7 +14,7 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
       res
         .status(500)
         .send(
-          `All fields are required: ${missingFields.join(", ")} are missing`
+          `All fields are required: ${missingFields.join(", ")} are missing`,
         );
       return;
     }
@@ -112,7 +112,7 @@ const updateUser = async (req: Request, res: Response) => {
     const user = await User.findByIdAndUpdate(
       id,
       { username, password },
-      { new: true }
+      { new: true },
     );
     res.status(202).json({ message: "User updated successfully", user });
     return;
