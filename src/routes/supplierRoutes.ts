@@ -15,7 +15,7 @@ router.post("", createSupplier);
 router.get("", getSuppliers);
 router.get("/:id", getSupplier);
 router.get("/:id/products", getSupplierProducts);
-router.put("/:id", updateSupplier);
+router.patch("/:id", updateSupplier);
 router.patch("/:id/status", toggleSupplierStatus);
 router.delete("/:id", deleteSupplier);
 

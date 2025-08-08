@@ -303,10 +303,13 @@ export const getProducts = async (
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
     if (lowStock === "true") {
-      filter.$expr = { $lt: ["$quantity", "$reorderLevel"] };
+      filter.$expr = { $lt: ["$stock", "$reorderLevel"] };
     }
 
-    const products = await Product.find(filter).populate("supplier");
+    const products = await Product.find(filter).populate(
+      "supplier",
+      "-_id name",
+    );
     res.json(products);
   } catch (error) {
     res.status(500).json({

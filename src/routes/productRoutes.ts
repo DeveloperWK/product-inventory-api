@@ -33,7 +33,7 @@ const router = Router();
 router.post("", createProduct);
 router.get("", getProducts);
 router.get("/:id", getProduct);
-router.put("/:id", updateProduct);
+router.patch("/:id", updateProduct);
 router.delete("/:id", deleteProduct);
 router.patch("/:id/stock", updateStock); // Special endpoint for stock management
 

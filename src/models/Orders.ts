@@ -13,7 +13,7 @@ export interface IOrder extends Document {
   totalAmount: Number;
   due: number;
   paymentStatus: "pending" | "paid" | "partial";
-  status: "processing" | "delivered" | "cancelled" | "completed";
+  status: "processing" | "delivered" | "cancelled" | "completed" | "returned";
   transaction: { type: mongoose.Schema.Types.ObjectId; ref: "Transaction" }; // Cash flow link
 }
 
@@ -30,7 +30,7 @@ const orderSchema = new mongoose.Schema<IOrder>(
     totalAmount: Number,
     status: {
       type: String,
-      enum: ["processing", "delivered", "cancelled", "completed"],
+      enum: ["processing", "delivered", "cancelled", "completed", "returned"],
       default: "processing",
     },
     paymentStatus: {
