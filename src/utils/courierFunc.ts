@@ -18,22 +18,22 @@ const handleCourier = async (data: courierData): Promise<courierResponse> => {
   console.log(JSON.stringify(data));
 
   try {
-    // const res = await fetch(`https://portal.packzy.com/api/v1/create_order`, {
-    //   method: "POST",
-    //   headers: {
-    //     "Api-Key": process.env.COURIER_API_KEY as string,
-    //     "Secret-Key": process.env.COURIER_SECRET_KEY as string,
-    //     "Content-Type": "application/json",
-    //   },
-    //   body: JSON.stringify(data),
-    // });
-    // const result = await res.json();
+    const res = await fetch(`${process.env.COURIER_URI}create_order`, {
+      method: "POST",
+      headers: {
+        "Api-Key": process.env.COURIER_API_KEY as string,
+        "Secret-Key": process.env.COURIER_SECRET_KEY as string,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    const result = await res.json();
     return {
-      status: "success",
-      message: "Consignment created successfully",
+      status: result.status,
+      message: result.message,
       consignment: {
-        consignment_id: 123456,
-        tracking_code: "ABC123",
+        consignment_id: result.consignment_id,
+        tracking_code: result.tracking_code,
       },
     };
   } catch (error) {

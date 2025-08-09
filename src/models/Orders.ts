@@ -41,8 +41,8 @@ const orderSchema = new mongoose.Schema<IOrder>(
       default: "pending",
     },
     transaction: { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
-    courierId: { type: String, unique: true },
-    trackingCode: { type: String, unique: true },
+    courierId: { type: String, unique: true, trim: true },
+    trackingCode: { type: String, unique: true, trim: true },
   },
   {
     timestamps: true,

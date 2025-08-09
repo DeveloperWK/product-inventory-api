@@ -10,9 +10,9 @@ export interface ISupplier extends Document {
 }
 
 const supplierSchema = new mongoose.Schema<ISupplier>({
-  name: { type: String, required: true },
+  name: { type: String, required: true, trim: true },
   contact: String,
-  paymentTerms: Number, // Days to pay (links to cash flow)
+  paymentTerms: Number,
   address: String,
   notes: String,
   isActive: { type: Boolean, default: true },

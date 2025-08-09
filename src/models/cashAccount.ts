@@ -16,6 +16,7 @@ const cashAccountSchema = new mongoose.Schema<ICashAccount>(
       type: String,
       required: true,
       unique: true,
+      trim: true,
     },
     type: {
       type: String,
@@ -31,8 +32,14 @@ const cashAccountSchema = new mongoose.Schema<ICashAccount>(
       type: String,
       default: "Tk",
     },
-    accountNumber: String,
-    institution: String,
+    accountNumber: {
+      type: String,
+      trim: true,
+    },
+    institution: {
+      type: String,
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

@@ -12,7 +12,7 @@ export interface IProduct extends Document {
 
 const productSchema = new Schema<IProduct>(
   {
-    name: { type: String, required: true },
+    name: { type: String, required: true, trim: true },
     price: { type: Number, required: true },
     category: {
       type: mongoose.Schema.Types.ObjectId,
@@ -20,7 +20,7 @@ const productSchema = new Schema<IProduct>(
       required: true,
     },
     stock: { type: Number, default: 0 },
-    sku: { type: String, unique: true },
+    sku: { type: String, unique: true, trim: true, required: true },
     cost: { type: Number, required: true },
     supplier: { type: mongoose.Schema.Types.ObjectId, ref: "Supplier" },
   },
