@@ -18,6 +18,7 @@ const createOrder = async (req: Request, res: Response): Promise<void> => {
       recipient_phone,
       recipient_address,
       note,
+      delivery_type,
     } = req.body;
     for (const item of items) {
       const product = await Product.findById(item.product).session(session);
@@ -32,15 +33,20 @@ const createOrder = async (req: Request, res: Response): Promise<void> => {
       note,
       cod_amount: totalAmount,
       invoice,
+      delivery_type,
     };
+    console.time("Courier API");
     const courier = await handleCourier(data);
+    console.timeEnd("Courier API");
+    console.log("Courier response:", courier);
+
     const newOrder: IOrder = await new Order({
       orderType,
       items,
       totalAmount,
       courierId: courier.consignment.consignment_id,
       trackingCode: courier.consignment.tracking_code,
-    }).save();
+    }).save({ session });
     for (const item of items) {
       await Product.findByIdAndUpdate(
         item.product,
@@ -112,9 +118,9 @@ const updateOrder = async (req: Request, res: Response): Promise<void> => {
 
     if (status) updates.status = status;
     if (paymentStatus) updates.paymentStatus = paymentStatus;
-    const updatedOrder = await Order.findByIdAndUpdate(id, updates, {
-      new: true,
-    }).populate("items.product");
+    const updatedOrder = await Order.findByIdAndUpdate(id, updates).populate(
+      "items.product",
+    );
 
     if (!updatedOrder) {
       res.status(404).json({ message: "Order not found" });
@@ -135,7 +141,9 @@ const updateOrder = async (req: Request, res: Response): Promise<void> => {
       }
     }
     await session.commitTransaction();
-    res.json(updatedOrder);
+    res.status(200).json({
+      message: "Order updated successfully",
+    });
   } catch (error) {
     await session.abortTransaction();
     res.status(500).json({

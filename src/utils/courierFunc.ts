@@ -5,6 +5,7 @@ interface courierData {
   recipient_address: string;
   cod_amount: number;
   note: string;
+  delivery_type: number;
 }
 interface courierResponse {
   status: string;
@@ -14,9 +15,7 @@ interface courierResponse {
     tracking_code: string;
   };
 }
-const handleCourier = async (data: courierData): Promise<courierResponse> => {
-  console.log(JSON.stringify(data));
-
+const handleCourier = async (data: courierData) => {
   try {
     const res = await fetch(`${process.env.COURIER_URI}create_order`, {
       method: "POST",
@@ -25,15 +24,19 @@ const handleCourier = async (data: courierData): Promise<courierResponse> => {
         "Secret-Key": process.env.COURIER_SECRET_KEY as string,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        delivery_type: Number(data.delivery_type),
+      }),
     });
     const result = await res.json();
+    console.log(result);
     return {
       status: result.status,
       message: result.message,
       consignment: {
-        consignment_id: result.consignment_id,
-        tracking_code: result.tracking_code,
+        consignment_id: result.consignment.consignment_id,
+        tracking_code: result.consignment.tracking_code,
       },
     };
   } catch (error) {

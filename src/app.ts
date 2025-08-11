@@ -8,6 +8,7 @@ import categoryRoutes from "./routes/categoryRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import productRoutes from "./routes/productRoutes";
 import supplierRoutes from "./routes/supplierRoutes";
+import totalCountRoute from "./routes/totalCountRoute";
 import userRoutes from "./routes/userRoutes";
 const app = express();
 
@@ -15,7 +16,7 @@ const app = express();
 app.use(
   cors({
     origin: "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    methods: ["GET", "POST", "PATCH", "DELETE"],
   }),
 );
 app.use(express.json());
@@ -28,6 +29,7 @@ app.use("/api/v1/orders", orderRoutes);
 app.use("/api/v1/cash-transactions", cashFlowRoutes);
 app.use("/api/v1/cash-account", cashAccountRoutes);
 app.use("/api/v1/suppliers", supplierRoutes);
+app.use("/api/v1/total-counts", totalCountRoute);
 
 // Middleware
 app.use(notFoundMiddleware);

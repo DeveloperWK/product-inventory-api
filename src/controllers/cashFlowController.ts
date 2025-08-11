@@ -140,7 +140,8 @@ const getCashFlowSummary = async (
 
 const getTransaction = async (req: Request, res: Response): Promise<void> => {
   try {
-    const transaction = await Transaction.findById(req.params.id)
+    const { id } = req.params;
+    const transaction = await Transaction.findById(id)
       .populate("relatedInventory")
       .populate("relatedOrder")
       .populate("cashAccount");
