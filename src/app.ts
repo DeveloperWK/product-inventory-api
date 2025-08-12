@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import morgan from "morgan";
 import errorHandler from "./middlewares/errorHandler";
 import notFoundMiddleware from "./middlewares/notFoundMiddleware";
 import cashAccountRoutes from "./routes/cashAccountRoutes";
@@ -20,6 +21,8 @@ app.use(
   }),
 );
 app.use(express.json());
+
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 // Routes
 app.use("/api/v1/products", productRoutes);

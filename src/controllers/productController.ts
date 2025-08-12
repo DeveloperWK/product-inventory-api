@@ -16,7 +16,6 @@ const createProduct = async (req: Request, res: Response): Promise<void> => {
       price,
       cost,
       stock,
-      description: req.body.description,
       category: req.body.category,
       reorderLevel: req.body.reorderLevel,
       supplier: req.body.supplier,
