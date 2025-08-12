@@ -9,6 +9,7 @@ export interface IBusinessOrder extends Document {
   total: number;
   discount: number;
   relatedTransactions: mongoose.Schema.Types.ObjectId[];
+  quantity: number;
 }
 
 const businessOrderSchema = new mongoose.Schema<IBusinessOrder>({
@@ -26,6 +27,7 @@ const businessOrderSchema = new mongoose.Schema<IBusinessOrder>({
   relatedTransactions: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
   ],
+  quantity: { type: Number, required: true },
 });
 
 const BusinessOrder = mongoose.model<IBusinessOrder>(

@@ -3,8 +3,9 @@ import express from "express";
 import morgan from "morgan";
 import errorHandler from "./middlewares/errorHandler";
 import notFoundMiddleware from "./middlewares/notFoundMiddleware";
+import businessOrderRoutes from "./routes/BusinessOrderRoutes";
 import cashAccountRoutes from "./routes/cashAccountRoutes";
-import cashFlowRoutes from "./routes/cashFlowRoutes";
+import cashFlowRoutes from "./routes/cashTransactionRoutes";
 import categoryRoutes from "./routes/categoryRoutes";
 import orderRoutes from "./routes/orderRoutes";
 import productRoutes from "./routes/productRoutes";
@@ -33,6 +34,7 @@ app.use("/api/v1/cash-transactions", cashFlowRoutes);
 app.use("/api/v1/cash-account", cashAccountRoutes);
 app.use("/api/v1/suppliers", supplierRoutes);
 app.use("/api/v1/total-counts", totalCountRoute);
+app.use("/api/v1/business-orders", businessOrderRoutes);
 
 // Middleware
 app.use(notFoundMiddleware);

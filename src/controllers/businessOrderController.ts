@@ -2,7 +2,10 @@ import { Request, Response } from "express";
 import mongoose from "mongoose";
 import BusinessOrder from "../models/BusinessOrder";
 
-const createBusinessOrder = async (req: Request, res: Response) => {
+const createBusinessOrder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const {
       name,
@@ -12,6 +15,7 @@ const createBusinessOrder = async (req: Request, res: Response) => {
       payment,
       total,
       discount,
+      quantity,
       relatedTransactions,
     } = req.body;
 
@@ -23,6 +27,7 @@ const createBusinessOrder = async (req: Request, res: Response) => {
       payment,
       total,
       discount,
+      quantity,
       relatedTransactions: relatedTransactions || [],
     });
 
@@ -46,7 +51,10 @@ const createBusinessOrder = async (req: Request, res: Response) => {
   }
 };
 
-const getAllBusinessOrders = async (req: Request, res: Response) => {
+const getAllBusinessOrders = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { page = 1, limit = 10, supplier } = req.query;
 
@@ -84,15 +92,19 @@ const getAllBusinessOrders = async (req: Request, res: Response) => {
   }
 };
 
-const getBusinessOrderById = async (req: Request, res: Response) => {
+const getBusinessOrderById = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Invalid business order ID",
       });
+      return;
     }
 
     const businessOrder = await BusinessOrder.findById(id)
@@ -100,10 +112,11 @@ const getBusinessOrderById = async (req: Request, res: Response) => {
       .populate("relatedTransactions");
 
     if (!businessOrder) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Business order not found",
       });
+      return;
     }
 
     res.status(200).json({
@@ -120,16 +133,20 @@ const getBusinessOrderById = async (req: Request, res: Response) => {
   }
 };
 
-const updateBusinessOrder = async (req: Request, res: Response) => {
+const updateBusinessOrder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { id } = req.params;
     const updateData = req.body;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Invalid business order ID",
       });
+      return;
     }
 
     delete updateData._id;
@@ -145,10 +162,11 @@ const updateBusinessOrder = async (req: Request, res: Response) => {
     );
 
     if (!updatedBusinessOrder) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Business order not found",
       });
+      return;
     }
 
     const populatedOrder = await BusinessOrder.findById(
@@ -171,24 +189,29 @@ const updateBusinessOrder = async (req: Request, res: Response) => {
   }
 };
 
-const deleteBusinessOrder = async (req: Request, res: Response) => {
+const deleteBusinessOrder = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { id } = req.params;
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Invalid business order ID",
       });
+      return;
     }
 
     const deletedBusinessOrder = await BusinessOrder.findByIdAndDelete(id);
 
     if (!deletedBusinessOrder) {
-      return res.status(404).json({
+      res.status(404).json({
         success: false,
         message: "Business order not found",
       });
+      return;
     }
 
     res.status(200).json({
@@ -205,16 +228,20 @@ const deleteBusinessOrder = async (req: Request, res: Response) => {
   }
 };
 
-const getBusinessOrdersBySupplier = async (req: Request, res: Response) => {
+const getBusinessOrdersBySupplier = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     const { supplierId } = req.params;
     const { page = 1, limit = 10 } = req.query;
 
     if (!mongoose.Types.ObjectId.isValid(supplierId)) {
-      return res.status(400).json({
+      res.status(400).json({
         success: false,
         message: "Invalid supplier ID",
       });
+      return;
     }
 
     const businessOrders = await BusinessOrder.find({ supplier: supplierId })
