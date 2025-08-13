@@ -13,7 +13,9 @@ import productRoutes from "./routes/productRoutes";
 import supplierRoutes from "./routes/supplierRoutes";
 import totalCountRoute from "./routes/totalCountRoute";
 import userRoutes from "./routes/userRoutes";
+
 const app = express();
+// Middleware
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
@@ -30,7 +32,6 @@ app.use(
 );
 
 app.use(express.json());
-
 app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 
 // Routes
