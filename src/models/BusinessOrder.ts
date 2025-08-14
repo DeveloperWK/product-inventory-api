@@ -23,9 +23,15 @@ const businessOrderSchema = new mongoose.Schema<IBusinessOrder>({
   due: { type: Number, default: 0 },
   payment: { type: Number, required: true },
   total: { type: Number, required: true },
-  discount: { type: Number, required: true },
+  discount: { type: Number },
   relatedTransactions: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Transaction" },
+    {
+      transactionId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Transaction",
+        required: true,
+      },
+    },
   ],
   quantity: { type: Number, required: true },
 });

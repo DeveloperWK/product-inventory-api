@@ -24,6 +24,7 @@ const limiter = rateLimit({
   standardHeaders: true,
 });
 app.use(limiter);
+
 app.use(
   cors({
     origin: process.env.CLIENT_URI,
