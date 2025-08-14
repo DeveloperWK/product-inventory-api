@@ -7,14 +7,15 @@ import {
   updateProduct,
   updateStock,
 } from "../controllers/productController";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("", createProduct);
+router.post("", authMiddleware, createProduct);
 router.get("", getProducts);
 router.get("/:id", getProduct);
-router.patch("/:id", updateProduct);
-router.delete("/:id", deleteProduct);
-router.patch("/:id/stock", updateStock); // Special endpoint for stock management
+router.patch("/:id", authMiddleware, updateProduct);
+router.delete("/:id", authMiddleware, deleteProduct);
+router.patch("/:id/stock", authMiddleware, updateStock);
 
 export default router;

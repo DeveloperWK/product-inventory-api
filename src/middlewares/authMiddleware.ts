@@ -2,11 +2,11 @@ import { configDotenv } from "dotenv";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 configDotenv();
-// Extend the Request interface to include a 'user' property
+
 declare global {
   namespace Express {
     interface Request {
-      locals?: any; // Replace 'any' with a proper type if you know the structure of the decoded token
+      locals?: any;
     }
   }
 }
@@ -20,7 +20,7 @@ if (!SECRET) {
 const authMiddleware = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): void => {
   try {
     const authHeader = req.headers["authorization"];
@@ -30,7 +30,6 @@ const authMiddleware = (
       return;
     }
 
-    // Extract the token (remove "Bearer " prefix)
     const token = authHeader.split(" ")[1];
 
     jwt.verify(token, SECRET, (err, decoded) => {

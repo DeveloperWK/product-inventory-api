@@ -8,15 +8,16 @@ import {
   toggleSupplierStatus,
   updateSupplier,
 } from "../controllers/supplierController";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = express.Router();
 
-router.post("", createSupplier);
-router.get("", getSuppliers);
-router.get("/:id", getSupplier);
-router.get("/:id/products", getSupplierProducts);
-router.patch("/:id", updateSupplier);
-router.patch("/:id/status", toggleSupplierStatus);
-router.delete("/:id", deleteSupplier);
+router.post("", authMiddleware, createSupplier);
+router.get("", authMiddleware, getSuppliers);
+router.get("/:id", authMiddleware, getSupplier);
+router.get("/:id/products", authMiddleware, getSupplierProducts);
+router.patch("/:id", authMiddleware, updateSupplier);
+router.patch("/:id/status", authMiddleware, toggleSupplierStatus);
+router.delete("/:id", authMiddleware, deleteSupplier);
 
 export default router;

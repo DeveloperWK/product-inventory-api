@@ -6,13 +6,14 @@ import {
   getOrders,
   updateOrder,
 } from "../controllers/OrderController";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("", createOrder);
-router.get("", getOrders);
-router.get("/:id", getOrder);
-router.patch("/:id", updateOrder);
-router.delete("/:id", deleteOrder);
+router.post("", authMiddleware, createOrder);
+router.get("", authMiddleware, getOrders);
+router.get("/:id", authMiddleware, getOrder);
+router.patch("/:id", authMiddleware, updateOrder);
+router.delete("/:id", authMiddleware, deleteOrder);
 
 export default router;

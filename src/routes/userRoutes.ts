@@ -12,7 +12,7 @@ import authMiddleware from "../middlewares/authMiddleware";
 
 const router: Router = express.Router();
 
-router.post("/register", createUser);
+router.post("/register", isAdminMiddleware, createUser);
 router.post("/login", loginUser);
 router.get("", authMiddleware, isAdminMiddleware, getUsers);
 

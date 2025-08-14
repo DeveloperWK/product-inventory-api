@@ -7,14 +7,21 @@ import {
   getBusinessOrdersBySupplier,
   updateBusinessOrder,
 } from "../controllers/businessOrderController";
+import isAdminMiddleware from "../middlewares/adminMiddleware";
+import authMiddleware from "../middlewares/authMiddleware";
 
 const router = Router();
 
-router.post("", createBusinessOrder);
-router.get("", getAllBusinessOrders);
-router.get("/:id", getBusinessOrderById);
-router.get("/supplier/:supplierId", getBusinessOrdersBySupplier);
-router.patch("/:id", updateBusinessOrder);
-router.delete("/:id", deleteBusinessOrder);
+router.post("", authMiddleware, isAdminMiddleware, createBusinessOrder);
+router.get("", authMiddleware, isAdminMiddleware, getAllBusinessOrders);
+router.get("/:id", authMiddleware, isAdminMiddleware, getBusinessOrderById);
+router.get(
+  "/supplier/:supplierId",
+  authMiddleware,
+  isAdminMiddleware,
+  getBusinessOrdersBySupplier,
+);
+router.patch("/:id", authMiddleware, isAdminMiddleware, updateBusinessOrder);
+router.delete("/:id", authMiddleware, isAdminMiddleware, deleteBusinessOrder);
 
 export default router;
