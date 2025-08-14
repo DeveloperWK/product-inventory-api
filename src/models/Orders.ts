@@ -27,6 +27,7 @@ const orderSchema = new mongoose.Schema<IOrder>(
         product: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
         quantity: Number,
         unitPrice: Number,
+        _id: false,
       },
     ],
     totalAmount: Number,
