@@ -5,10 +5,9 @@ const errorHandler = (
   err: Error,
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  console.log("nodeenv", process.env.NODE_ENV);
 
   res.status(statusCode).json({
     message: err.message,

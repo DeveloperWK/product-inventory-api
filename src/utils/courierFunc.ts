@@ -16,40 +16,32 @@ interface courierResponse {
   };
 }
 const handleCourier = async (data: courierData) => {
-  // try {
-  //   const res = await fetch(`${process.env.COURIER_URI}create_order`, {
-  //     method: "POST",
-  //     headers: {
-  //       "Api-Key": process.env.COURIER_API_KEY as string,
-  //       "Secret-Key": process.env.COURIER_SECRET_KEY as string,
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify({
-  //       ...data,
-  //       delivery_type: Number(data.delivery_type),
-  //     }),
-  //   });
-  //   const result = await res.json();
-  //   console.log(result);
-  //   return {
-  //     status: result.status,
-  //     message: result.message,
-  //     consignment: {
-  //       consignment_id: result.consignment.consignment_id,
-  //       tracking_code: result.consignment.tracking_code,
-  //     },
-  //   };
-  // } catch (error) {
-  //   console.error(error);
-  //   throw error;
-  // }
-  return Promise.resolve({
-    status: "success",
-    message: "Order created successfully",
-    consignment: {
-      consignment_id: 12345,
-      tracking_code: "ABC123",
-    },
-  });
+  try {
+    const res = await fetch(`${process.env.COURIER_URI}create_order`, {
+      method: "POST",
+      headers: {
+        "Api-Key": process.env.COURIER_API_KEY as string,
+        "Secret-Key": process.env.COURIER_SECRET_KEY as string,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        ...data,
+        delivery_type: Number(data.delivery_type),
+      }),
+    });
+    const result = await res.json();
+    console.log(result);
+    return {
+      status: result.status,
+      message: result.message,
+      consignment: {
+        consignment_id: result.consignment.consignment_id,
+        tracking_code: result.consignment.tracking_code,
+      },
+    };
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 export default handleCourier;
