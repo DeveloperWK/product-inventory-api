@@ -30,6 +30,7 @@ const businessOrderSchema = new mongoose.Schema<IBusinessOrder>({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Transaction",
         required: true,
+        _id: false,
       },
     },
   ],
