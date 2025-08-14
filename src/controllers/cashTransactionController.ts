@@ -8,9 +8,23 @@ const createTransaction = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { type, category, amount, paymentMethod, cashAccount } = req.body;
+    const {
+      type,
+      category,
+      amount,
+      paymentMethod,
+      cashAccount,
+      transactionId,
+    } = req.body;
 
-    if (!type || !category || !amount || !paymentMethod || !cashAccount) {
+    if (
+      !type ||
+      !category ||
+      !amount ||
+      !paymentMethod ||
+      !cashAccount ||
+      !transactionId
+    ) {
       res.status(400).json({ message: "Missing required fields" });
       return;
     }
@@ -82,8 +96,6 @@ const getTransactions = async (req: Request, res: Response): Promise<void> => {
     }
 
     const transactions = await Transaction.find(filter)
-      .populate("relatedInventory")
-      .populate("relatedOrder")
       .populate("cashAccount")
       .sort({ date: -1 });
 

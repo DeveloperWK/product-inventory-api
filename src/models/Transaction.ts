@@ -7,10 +7,9 @@ export interface ITransaction extends Document {
   date: string;
   description: string;
   paymentMethod: string;
-  relatedInventory: mongoose.Schema.Types.ObjectId;
-  relatedOrder: mongoose.Schema.Types.ObjectId;
   isRecurring: boolean;
   cashAccount: mongoose.Schema.Types.ObjectId;
+  transactionId: string;
 }
 
 const transactionSchema = new mongoose.Schema<ITransaction>(
@@ -25,14 +24,13 @@ const transactionSchema = new mongoose.Schema<ITransaction>(
     date: { type: String, default: new Date().toISOString() },
     description: String,
     paymentMethod: String,
-    relatedInventory: { type: mongoose.Schema.Types.ObjectId, ref: "Product" }, // Links to inventory
-    relatedOrder: { type: mongoose.Schema.Types.ObjectId, ref: "Order" }, // Optional
     isRecurring: { type: Boolean, default: false },
     cashAccount: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "CashAccount",
       required: true,
     },
+    transactionId: String,
   },
   {
     timestamps: true,
