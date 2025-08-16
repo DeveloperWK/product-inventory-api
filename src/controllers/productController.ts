@@ -90,7 +90,6 @@ const updateProduct = async (req: Request, res: Response): Promise<void> => {
     }
 
     const updatedProduct = await Product.findByIdAndUpdate(id, updates, {
-      new: true,
       runValidators: true,
     }).populate("supplier");
 
