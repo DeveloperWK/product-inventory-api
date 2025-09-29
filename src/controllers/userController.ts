@@ -1,8 +1,8 @@
-import bcrypt from "bcryptjs";
 import { configDotenv } from "dotenv";
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/Users";
+import { hashPassword, verifyPassword } from "../services/password.service";
 configDotenv();
 const SECRET = process.env.AUTH_SECRET as string;
 
@@ -14,7 +14,7 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
       res
         .status(500)
         .send(
-          `All fields are required: ${missingFields.join(", ")} are missing`,
+          `All fields are required: ${missingFields.join(", ")} are missing`
         );
       return;
     }
@@ -29,7 +29,11 @@ const createUser = async (req: Request, res: Response): Promise<void> => {
       res.status(500).send("User already exists");
       return;
     }
-    const user = await new User({ username, email, password }).save();
+    const user = await new User({
+      username,
+      email,
+      password: await hashPassword(password),
+    }).save();
 
     res.status(201).json({
       message: "User created successfully",
@@ -72,7 +76,7 @@ const loginUser = async (req: Request, res: Response): Promise<void> => {
     res.status(500).json({ message: "User not found" });
     return;
   }
-  const isPasswordValid = await user.comparePassword(password);
+  const isPasswordValid = await verifyPassword(password, user.password);
   if (!isPasswordValid) {
     res.status(401).json({ message: "Invalid username or password" });
     return;
@@ -103,16 +107,11 @@ const deleteUser = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { username, password } = req.body;
-  if (password) {
-    const salt = await bcrypt.genSalt(10);
-    const hashPassword = await bcrypt.hash(password, salt);
-    req.body.password = hashPassword;
-  }
   try {
     const user = await User.findByIdAndUpdate(
       id,
-      { username, password },
-      { new: true },
+      { username, password: await hashPassword(password) },
+      { new: true }
     );
     res.status(202).json({ message: "User updated successfully", user });
     return;

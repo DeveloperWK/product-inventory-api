@@ -1,4 +1,3 @@
-import bcrypt from "bcryptjs";
 import mongoose, { Document, Model, Schema } from "mongoose";
 
 export interface IUser extends Document {
@@ -43,22 +42,22 @@ const userSchema = new Schema<IUser>(
   }
 );
 
-userSchema.pre("save", async function (this: IUser, next) {
-  if (!this.isModified("password")) return next();
-  try {
-    const salt = await bcrypt.genSalt(10);
-    this.password = await bcrypt.hash(this.password, salt);
-    next();
-  } catch (error) {
-    next(error as Error);
-  }
-});
+// userSchema.pre("save", async function (this: IUser, next) {
+//   if (!this.isModified("password")) return next();
+//   try {
+//     const salt = await bcrypt.genSalt(10);
+//     this.password = await bcrypt.hash(this.password, salt);
+//     next();
+//   } catch (error) {
+//     next(error as Error);
+//   }
+// });
 
-userSchema.methods.comparePassword = async function (
-  candidatePassword: string
-): Promise<boolean> {
-  return await bcrypt.compare(candidatePassword, this.password);
-};
+// userSchema.methods.comparePassword = async function (
+//   candidatePassword: string
+// ): Promise<boolean> {
+//   return await bcrypt.compare(candidatePassword, this.password);
+// };
 
 const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 
