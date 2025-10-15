@@ -1,5 +1,6 @@
 import cors from "cors";
 import express from "express";
+import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 import errorHandler from "./middlewares/errorHandler";
 import notFoundMiddleware from "./middlewares/notFoundMiddleware";
@@ -15,14 +16,14 @@ import userRoutes from "./routes/userRoutes";
 
 const app = express();
 // Middleware
-// const limiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 100,
-//   message: "Too many requests from this IP, please try again later.",
-//   validate: true,
-//   standardHeaders: true,
-// });
-// app.use(limiter);
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: "Too many requests from this IP, please try again later.",
+  validate: true,
+  standardHeaders: true,
+});
+app.use(limiter);
 
 app.use(
   cors({
