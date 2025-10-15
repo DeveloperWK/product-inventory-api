@@ -5,7 +5,7 @@ import Transaction, { ITransaction } from "../models/Transaction";
 
 const createTransaction = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<void> => {
   try {
     const {
@@ -57,7 +57,7 @@ const createTransaction = async (
       await CashAccount.findByIdAndUpdate(
         cashAccount,
         { balance: newBalance },
-        { new: true, session },
+        { new: true, session }
       );
 
       await session.commitTransaction();
@@ -96,10 +96,10 @@ const getTransactions = async (req: Request, res: Response): Promise<void> => {
     }
 
     const transactions = await Transaction.find(filter)
-      .populate("cashAccount")
+      .populate("cashAccount", "-_id name")
       .sort({ date: -1 });
 
-    res.json(transactions);
+    res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({
       message: "Error fetching transactions",
@@ -110,7 +110,7 @@ const getTransactions = async (req: Request, res: Response): Promise<void> => {
 
 const getCashFlowSummary = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<void> => {
   try {
     const { startDate, endDate } = req.query;
@@ -173,7 +173,7 @@ const getTransaction = async (req: Request, res: Response): Promise<void> => {
 
 const updateTransaction = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<void> => {
   try {
     const { amount, type, cashAccount } = req.body;
@@ -220,7 +220,7 @@ const updateTransaction = async (
           await CashAccount.findByIdAndUpdate(
             oldAccount._id,
             { $inc: { balance: oldAmountEffect } },
-            { session },
+            { session }
           );
         }
 
@@ -235,14 +235,14 @@ const updateTransaction = async (
                   : newAmountEffect,
             },
           },
-          { session },
+          { session }
         );
       }
 
       const updatedTransaction = await Transaction.findByIdAndUpdate(
         req.params.id,
         req.body,
-        { new: true, session },
+        { new: true, session }
       );
 
       await session.commitTransaction();
@@ -263,7 +263,7 @@ const updateTransaction = async (
 
 const deleteTransaction = async (
   req: Request,
-  res: Response,
+  res: Response
 ): Promise<void> => {
   try {
     const transaction = await Transaction.findById(req.params.id);
@@ -285,7 +285,7 @@ const deleteTransaction = async (
       await CashAccount.findByIdAndUpdate(
         transaction.cashAccount,
         { $inc: { balance: amountEffect } },
-        { session },
+        { session }
       );
 
       await Transaction.findByIdAndDelete(req.params.id, { session });
