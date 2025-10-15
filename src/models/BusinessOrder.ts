@@ -26,11 +26,11 @@ const businessOrderSchema = new mongoose.Schema<IBusinessOrder>({
   discount: { type: Number },
   relatedTransactions: [
     {
+      _id: false,
       transactionId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Transaction",
         required: true,
-        _id: false,
       },
     },
   ],
@@ -39,6 +39,6 @@ const businessOrderSchema = new mongoose.Schema<IBusinessOrder>({
 
 const BusinessOrder = mongoose.model<IBusinessOrder>(
   "BusinessOrder",
-  businessOrderSchema,
+  businessOrderSchema
 );
 export default BusinessOrder;
