@@ -30,7 +30,7 @@ const handleCourier = async (data: courierData) => {
       }),
     });
     const result = await res.json();
-    console.log(result);
+
     return {
       status: result.status,
       message: result.message,

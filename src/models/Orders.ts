@@ -8,7 +8,7 @@ export interface IOrder extends Document {
       product: Schema.Types.ObjectId;
       quantity: Number;
       unitPrice: Number;
-    },
+    }
   ];
   totalAmount: Number;
   due: number;
@@ -33,7 +33,7 @@ const orderSchema = new mongoose.Schema<IOrder>(
     totalAmount: Number,
     status: {
       type: String,
-      enum: ["processing", "delivered", "cancelled", "completed", "returned"],
+      enum: ["processing", "delivered", "cancelled", "returned"],
       default: "processing",
     },
     paymentStatus: {
@@ -47,13 +47,9 @@ const orderSchema = new mongoose.Schema<IOrder>(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-// orderSchema.index({
-//   title:"text",
-//   body:"text",
-//   }, { background: true })
 orderSchema.index(
   {
     title: "text",
@@ -64,7 +60,7 @@ orderSchema.index(
       body: 5,
     },
     name: "courierId",
-  },
+  }
 );
 const Order = mongoose.model<IOrder>("Order", orderSchema);
 export default Order;

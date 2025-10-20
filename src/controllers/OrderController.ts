@@ -35,10 +35,8 @@ const createOrder = async (req: Request, res: Response): Promise<void> => {
       invoice,
       delivery_type,
     };
-    console.time("Courier API");
+
     const courier = await handleCourier(data);
-    console.timeEnd("Courier API");
-    console.log("Courier response:", courier);
 
     const newOrder: IOrder = await new Order({
       orderType,
